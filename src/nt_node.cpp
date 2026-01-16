@@ -161,6 +161,24 @@ Variant NT4::get_value(String topic_name, Variant default_val) {
       arr[i] = String(res[i].c_str());
     return arr;
   }
+  case NT_RAW: {
+    auto it = raw_subs.find(key);
+    if (it == raw_subs.end()) {
+      // "struct" type string is common but not strictly required for generic
+      // RAW, but we need *some* type string. "raw" is safe.
+      nt::RawSubscriber sub =
+          inst.GetRawTopic(key).Subscribe("raw", {}, GetFastInterval());
+      raw_subs.emplace(key, std::move(sub));
+      it = raw_subs.find(key);
+    }
+    std::vector<uint8_t> res = it->second.Get();
+    PackedByteArray arr;
+    arr.resize(res.size());
+    for (size_t i = 0; i < res.size(); i++) {
+      arr[i] = res[i];
+    }
+    return arr;
+  }
   default:
     return default_val;
   }

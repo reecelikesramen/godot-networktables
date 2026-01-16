@@ -94,6 +94,10 @@ public:
                                      PackedStringArray default_val);
   void set_string_array(String topic, PackedStringArray value);
 
+  // Raw / Generic
+  PackedByteArray get_raw(String topic, PackedByteArray default_val);
+  void set_raw(String topic, PackedByteArray value);
+
   // Geometry
   Vector2 get_translation2d(String topic, Vector2 default_val);
   double get_rotation2d(String topic, double default_val);
