@@ -6,6 +6,11 @@
 #include <networktables/BooleanTopic.h>
 #include <networktables/DoubleArrayTopic.h>
 #include <networktables/DoubleTopic.h>
+#include <networktables/FloatArrayTopic.h>
+#include <networktables/FloatTopic.h>
+#include <networktables/IntegerArrayTopic.h>
+#include <networktables/IntegerTopic.h>
+#include <networktables/MultiSubscriber.h>
 #include <networktables/NetworkTableInstance.h>
 #include <networktables/RawTopic.h>
 #include <networktables/StringArrayTopic.h>
@@ -22,8 +27,10 @@
 // Additional Godot Types
 #include <godot_cpp/variant/array.hpp>
 #include <godot_cpp/variant/dictionary.hpp>
+#include <godot_cpp/variant/variant.hpp>
 
 #include <map>
+#include <span>
 #include <string>
 #include <vector>
 
@@ -42,7 +49,11 @@ private:
   std::map<std::string, nt::BooleanSubscriber> boolean_subs;
   std::map<std::string, nt::StringSubscriber> string_subs;
   std::map<std::string, nt::BooleanArraySubscriber> boolean_array_subs;
+  std::map<std::string, nt::FloatSubscriber> float_subs;
+  std::map<std::string, nt::IntegerSubscriber> integer_subs;
+  std::map<std::string, nt::FloatArraySubscriber> float_array_subs;
   std::map<std::string, nt::StringArraySubscriber> string_array_subs;
+  std::unique_ptr<nt::MultiSubscriber> all_sub;
 
   // FIX: This was the cause of your compile error!
   std::map<std::string, nt::DoublePublisher> double_pubs;
@@ -60,6 +71,9 @@ public:
 
   double get_number(String topic, double default_val);
   void set_number(String topic, double value);
+
+  // Generic value access
+  Variant get_value(String topic, Variant default_val);
 
   // FIX: Return PackedFloat64Array instead of std::vector to prevent ABI
   // crashes
@@ -88,9 +102,11 @@ public:
   Vector3 get_translation3d(String topic, Vector3 default_val);
   Quaternion get_rotation3d(String topic, Quaternion default_val);
   Transform3D get_pose3d(String topic, Transform3D default_val);
+  Array get_pose3d_array(String topic, Array default_val);
 
   // Discovery
   Array get_topic_info();
+  void subscribe_to_all();
 
 protected:
   static void _bind_methods();
